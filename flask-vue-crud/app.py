@@ -15,8 +15,8 @@ CORS(app)
 
 # sanity check route
 @app.route('/healthcheck', methods=['GET'])
-def ping_pong():
-    return jsonify('Bullseye server alive')
+def healthcheck():
+    return jsonify('Bullseye watching your advice')
 
 if __name__ == '__main__':
     app.run()
