@@ -5,10 +5,11 @@
         <b-card bg-variant="light" text-variant="red" title="Bulls-eye advice">
           <b-card-text>
             Perhaps your advice will save someone's life.
-            Or allow them to find a cafe with a best pho-bo. Who knows.
+            Or help them to find a cafe with a best pho-bo. Who knows.
           </b-card-text>
           <b-button href="#" variant="danger" v-b-modal.advice-modal>Advise them</b-button>
         </b-card>
+        <alert :message="message" v-if="showMessage"></alert>
         <br><br>
         <table class="table table-hover">
           <thead>
@@ -71,7 +72,6 @@
           <b-form-input id="form-author-input"
                         type="text"
                         v-model="addAdviceForm.author"
-                        required
                         placeholder="Anonymous">
           </b-form-input>
         </b-form-group>
@@ -103,6 +103,7 @@
 
 <script>
 import axios from 'axios';
+import Alert from './Alert';
 
 export default {
   computed: {
@@ -115,7 +116,7 @@ export default {
       if (this.addAdviceForm.title.length > 100) {
         return 'Blah Blah Blah, write briefly and to the point';
       }
-      return 'What are you waiting for?';
+      return 'tik-tok...What are you waiting for?';
     },
   },
   data() {
@@ -127,7 +128,12 @@ export default {
         verified: [],
         tags: [],
       },
+      message: '',
+      showMessage: false,
     };
+  },
+  components: {
+    alert: Alert,
   },
   methods: {
     getAdvices() {
@@ -146,6 +152,8 @@ export default {
       axios.post(path, payload)
         .then(() => {
           this.getAdvices();
+          this.message = 'Nice catch!';
+          this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line

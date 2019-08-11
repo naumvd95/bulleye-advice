@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask import Flask, jsonify, request, abort
+import petname
 import logging
 
 
@@ -20,6 +21,11 @@ def validate_advice(advice, tags = []):
     assert 0 < len(advice) < 100, 'Incorrect Advice title length (symbol amount should be between 1 and 100)'
     assert len(tags) < 4, 'Advice tags should be no more than 3'
 
+def validate_author(author):
+    if not author or author == 'Anonymous':
+        author = petname.generate(2, ' ')
+    return author
+
 # Fake advice list
 ADVICES = [
     {
@@ -36,7 +42,7 @@ ADVICES = [
     },
     {
         'title': 'Do not smoke weed and drink simultaneously',
-        'author': 'vnaumov',
+        'author': '',
         'verified': True,
         'tags': ['Europe', 'Weed']
     }
@@ -53,6 +59,7 @@ def all_advices():
     if request.method == 'POST':
         post_data = request.get_json()
 
+        adv_author = validate_author(post_data.get('author', 'Anonymous'))
         adv = post_data.get('title','')
         adv_tags = post_data.get('tags',[])
         try:
@@ -61,11 +68,12 @@ def all_advices():
             logging.error(e)
             abort(400, e)
 
+
         ADVICES.append({
             'title': adv,
-            'author': post_data.get('author', 'Anonymous'),
+            'author': adv_author,
             'tags': adv_tags,
-            'read': post_data.get('verified', False)
+            'verified': post_data.get('verified', False)
         })
         response_object['message'] = 'Advice added!'
     else:
